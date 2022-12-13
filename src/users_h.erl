@@ -51,10 +51,11 @@ users_json(Req, State) ->
 
 users_h(Req, State) ->
   Method = cowboy_req:method(Req),
-  req_h(Method),
+  {_, Body, _} = cowboy_req:read_body(Req),
+  req_h(Method, Body),
   {true, Req, State}.
 
-req_h(<<"POST">>) ->
-  ok;
-req_h(<<"PUT">>) ->
-  ok.
+req_h(<<"POST">>, Body) ->
+  db_q:add_user(Body);
+req_h(<<"PUT">>, Body) ->
+  db_q:update_user(Body).

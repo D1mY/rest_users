@@ -22,7 +22,8 @@ auth_json(Req, State) ->
     {ok, #{<<"login">> := Lo, <<"password">> := Pa}} ->
       Resp = db_q:get_auth(Lo,Pa),
       Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
-      {true, Req1, State};
+      Req2 = cowboy_req:set_resp_header(<<"cache-control">>, "no-store", Req1),
+      {true, Req2, State};
     _ ->
       {false, Req, State}
   end.
