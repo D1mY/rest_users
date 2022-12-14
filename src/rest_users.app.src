@@ -8,9 +8,9 @@
     ,stdlib
     ,cowboy
     ,thoas
-    ,epgsql
+    ,pgo
    ]},
-  {env,[]},
+  {env, []},
   {modules, []},
 
   {licenses, ["Apache-2.0"]},
