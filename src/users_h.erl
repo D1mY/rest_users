@@ -52,10 +52,11 @@ users_json(Req, State) ->
 users_h(Req, State) ->
   Method = cowboy_req:method(Req),
   {_, Body, _} = cowboy_req:read_body(Req),
-  req_h(Method, Body),
-  {true, Req, State}.
+  Resp = method_h(Method, Body),
+  Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
+  {true, Req1, State}.
 
-req_h(<<"POST">>, Body) ->
-  db_q:add_user(Body);
-req_h(<<"PUT">>, Body) ->
-  db_q:update_user(Body).
+method_h(<<"POST">>, Body) ->
+  db_q:add_user(thoas:decode(Body));
+method_h(<<"PUT">>, Body) ->
+  db_q:update_user(thoas:decode(Body)).

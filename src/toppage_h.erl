@@ -10,8 +10,8 @@ init(Req0, Opts) ->
         <<"content-type">> => <<"application/json">>
         },
         <<"{\"name\":\"rest_users\",",
-            "\"version\":\"0.1.0\",
-            \"links\":[
+            "\"version\":\"0.1.0\",",
+            "\"links\":[
                 {\"href\":\"/users\",
                  \"rel\":\"create\",
                  \"method\":\"POST\"},
@@ -24,7 +24,7 @@ init(Req0, Opts) ->
                 {\"href\":\"/users\",
                  \"rel\":\"list\",
                  \"method\":\"GET\"}
-                ]}">>,
+                ]}\n">>,
         Req0),
     % {cowboy_rest, Req, Opts}.
     {ok, Req, Opts}.

@@ -2,11 +2,11 @@ create table if not exists users
 (
  id bigserial,
  name text,
- login text unique,
- password text not null,
- passsault text not null,
- created_at timestamp(0),
- updated_at timestamp(0),
+ login varchar(100) unique,
+ password bytea not null,
+ passsalt bytea not null,
+ created_at integer,
+ updated_at integer,
  token text unique,
- token_expiration timestamp(0)
+ token_expiration integer
 );

@@ -1,11 +1,12 @@
 {application, rest_users,
- [{description, "An OTP application"},
+ [{description, "OTP application as REST API service"},
   {vsn, "0.1.0"},
   {registered, []},
   {mod, {rest_users_app, []}},
   {applications,
    [kernel
     ,stdlib
+    ,crypto
     ,cowboy
     ,thoas
     ,pgo
