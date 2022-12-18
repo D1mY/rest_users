@@ -3,8 +3,10 @@
 -export([init/2]).
 -export([allowed_methods/2]).
 -export([content_types_accepted/2]).
+
 -export([auth_json/2]).
 
+%%%% API -----------------------------------------------------------------------------------------
 init(Req, Opts) ->
   {cowboy_rest, Req, Opts}.
 
@@ -16,6 +18,7 @@ content_types_accepted(Req, State) ->
     {<<"application/json">>, auth_json}
   ], Req, State}.
 
+%%%% Handlers ------------------------------------------------------------------------------------
 auth_json(Req, State) ->
   {_, Body, _} = cowboy_req:read_body(Req),
   case thoas:decode(Body) of
