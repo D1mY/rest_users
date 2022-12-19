@@ -80,10 +80,11 @@ update_user(UserObj) ->
     ok.
 
 %  -> [id,name]<-
+-spec get_users() -> list().
 get_users() ->
     case pgo:query(<<"SELECT id, name FROM users;">>, [], ?PGODECOPTS) of
-        #{rows := Resp} ->
-            Resp;
+        #{num_rows := Num, rows := Resp} ->
+            [#{count => Num, users => Resp}];
         _ ->
             [{error, <<"unavailable">>}]
     end.

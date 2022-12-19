@@ -40,8 +40,7 @@ is_conflict(Req, State) ->
 %%%% Handlers ------------------------------------------------------------------------------------
 users_json(Req, State) ->
   Resp = db_q:get_users(),
-  Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
-  {true, Req1, State}.
+  {thoas:encode(Resp), Req, State}.
 
 users_h(Req, State) ->
   Method = cowboy_req:method(Req),
