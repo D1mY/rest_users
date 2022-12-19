@@ -11,7 +11,7 @@
 %  token-> ?tokenexp<-
 -spec check_auth(bitstring()) -> boolean().
 check_auth(Token) ->
-    Res = pgo:query("SELECT token_expiration FROM users WHERE token = $1;", [Token], ?PGODECOPTS),
+    Res = pgo:query(<<"SELECT token_expiration FROM users WHERE token = $1;">>, [Token], ?PGODECOPTS),
     case Res of
         #{num_rows := 1, rows := [#{token_expiration := TokenExpiration}]} ->
             TokenExpiration > os:system_time(seconds);
@@ -22,11 +22,12 @@ check_auth(Token) ->
 %  login->,password-> token<->,tokenexp<->,token_type<-
 -spec get_auth(bitstring(), bitstring()) -> list().
 get_auth(Login, Password) ->
-    pgo:transaction(fun() ->
-        % Postgres will drop idle transaction session after <timeout>
-        pgo:query("SET idle_in_transaction_session_timeout = $1;", [10000]), 
-        handle_auth(Login, Password)
-    end).
+  % Postgres will drop idle transaction session after <Timeout>
+  Timeout = 10000,
+  pgo:query(<<"SET 'idle_in_transaction_session_timeout' = $1;">>, [Timeout]),
+  pgo:transaction(fun() ->
+    handle_auth(Login, Password)
+  end).
 
 %  login->,password->,name?> token<->,tokenexp<->,created->,encpass->,passsalt->,login->,name?>
 -spec add_user(map()) -> list().
@@ -40,8 +41,7 @@ add_user(#{<<"login">> := Login, <<"password">> := Password} = UserObj) ->
       Token = helpers:new_token(),
       TokenExp = helpers:new_token_expiration(CreatedAt),
       Resp = pgo:query(
-        "INSERT INTO users (name, login, password, passsalt, created_at, token, token_expiration)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING token, token_expiration;",
+        <<"INSERT INTO users (name, login, password, passsalt, created_at, token, token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING token, token_expiration;">>,
         [Name, Login, EncPass, PassSalt, CreatedAt, Token, TokenExp],
         ?PGODECOPTS
       ),
@@ -93,7 +93,7 @@ get_users() ->
 check_l(Login) ->
   Resp =
     pgo:query(
-      "SELECT password, passsalt FROM users WHERE login = $1 FOR UPDATE NOWAIT;",
+      <<"SELECT password, passsalt FROM users WHERE login = $1 FOR UPDATE NOWAIT;">>,
       [Login],
       ?PGODECOPTS
     ),
@@ -105,7 +105,7 @@ check_l(Login) ->
   end.
 
 check_new_l(Login) ->
-  case pgo:query("SELECT login FROM users WHERE login = $1;", [Login], ?PGODECOPTS) of
+  case pgo:query(<<"SELECT login FROM users WHERE login = $1;">>, [Login], ?PGODECOPTS) of
     #{num_rows := 1, rows := [#{login := Login}]} ->
       false;
     _ ->
@@ -129,8 +129,7 @@ handle_auth(Login, 'ok') ->
   TokenExpiration = helpers:new_token_expiration('new'),
   Resp =
     pgo:query(
-      "UPDATE users SET token = $1, token_expiration = $2
-       WHERE (login = $3) RETURNING token, token_expiration;",
+      <<"UPDATE users SET token = $1, token_expiration = $2 WHERE (login = $3) RETURNING token, token_expiration;">>,
       [Token, TokenExpiration, Login],
       ?PGODECOPTS
     ),
