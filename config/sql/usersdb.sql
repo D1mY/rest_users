@@ -7,6 +7,6 @@ create table if not exists users
  passsalt bytea not null,
  created_at integer,
  updated_at integer,
- token text unique,
+ token text,
  token_expiration integer
 );

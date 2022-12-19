@@ -46,7 +46,7 @@ users_h(Req, State) ->
   Method = cowboy_req:method(Req),
   {_, Body, _} = cowboy_req:read_body(Req),
   UserObj = thoas:decode(Body),
-  Resp = method_h(Method, UserObj),
+  Resp = method_h(Method, UserObj, Req),
   Status = case Resp of
     [{error,_}] -> false;
     _ -> true
@@ -70,10 +70,11 @@ is_auth_h(Req) ->
         {false, <<"Bearer realm=\"cowboy\"">>}
   end.
 
-method_h(_, {error, _Error}) ->
+method_h(_, {error, _Error}, _) ->
   %TODO log(_Error)
   [{error, <<"incorrect input">>}];
-method_h(<<"POST">>, {ok, UserObj}) ->
+method_h(<<"POST">>, {ok, UserObj}, _) ->
   db_q:add_user(UserObj);
-method_h(<<"PUT">>, {ok, UserObj}) ->
-  db_q:update_user(UserObj).
+method_h(<<"PUT">>, {ok, UserObj}, Req) ->
+  {bearer, Token} = cowboy_req:parse_header(<<"authorization">>, Req),
+  db_q:update_user(UserObj#{token => Token}).
