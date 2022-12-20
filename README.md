@@ -1,15 +1,15 @@
-###rest_users
+# rest_users
 
 OTP application as REST API service
 
-##Test
+## Test
 
 `rebar3 ct`
 
-##Build
+## Build
 
 `rebar3 compile`
 
-##Deploy
+## Deploy
 
 `docker compose up`
