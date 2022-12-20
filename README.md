@@ -1,27 +1,15 @@
-rest_users
-=====
+###rest_users
 
 OTP application as REST API service
 
-Test
------
+##Test
 
-    $ rebar3 ct
+`rebar3 ct`
 
-Build
------
+##Build
 
-    $ rebar3 compile
+`rebar3 compile`
 
-Deploy
------
+##Deploy
 
-    $ docker compose up
-
-SSL keys
------
-    ```
-    openssl req -new -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 \
-     -x509 -days 365 -nodes -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com" \
-     -keyout ./priv/ssl/server.key -out ./priv/ssl/server.pem
-    ```
+`docker compose up`
