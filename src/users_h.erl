@@ -5,6 +5,7 @@
 -export([is_authorized/2]).
 -export([content_types_accepted/2]).
 -export([content_types_provided/2]).
+-export([options/2]).
 
 -export([users_json/2]).
 -export([users_h/2]).
@@ -17,13 +18,15 @@ is_authorized(Req, State) ->
     case cowboy_req:method(Req) of
         <<"POST">> ->
             {true, Req, State};
+        <<"OPTIONS">> ->
+            {true, Req, State};
         _ ->
             {Res, Req1} = is_auth_h(Req),
             {Res, Req1, State}
     end.
 
 allowed_methods(Req, State) ->
-    {[<<"POST">>, <<"PUT">>, <<"GET">>], Req, State}.
+    {[<<"OPTIONS">>, <<"POST">>, <<"PUT">>, <<"GET">>], Req, State}.
 
 content_types_provided(Req, State) ->
     {[{<<"application/json">>, users_json}], Req, State}.
@@ -31,10 +34,22 @@ content_types_provided(Req, State) ->
 content_types_accepted(Req, State) ->
     {[{<<"application/json">>, users_h}], Req, State}.
 
+options(Req, State) ->
+    {ok, JSON} = file:read_file("priv/users_body.json"),
+    Req1 = cowboy_req:set_resp_body(JSON, Req),
+    {ok, Req1, State}.
+
 %%%% Handlers ------------------------------------------------------------------------------------
 users_json(Req, State) ->
     Resp = db_q:get_users(),
-    {thoas:encode(Resp), Req, State}.
+    case Resp of
+            {error, Error} ->
+                Req1 = helpers:five00(Req, Error),
+                {stop, Req1, State};
+            _ ->
+                Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
+                {true, Req1, State}
+        end.
 
 users_h(Req, State) ->
     Method = cowboy_req:method(Req),
@@ -42,8 +57,8 @@ users_h(Req, State) ->
     UserObj = thoas:decode(Body),
     Resp = method_h(Method, UserObj, Req),
         case Resp of
-            {error, _} ->
-                Req1 = helpers:five00(Req),
+            {error, Error} ->
+                Req1 = helpers:five00(Req, Error),
                 {stop, Req1, State};
             _ ->
                 Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
@@ -63,8 +78,8 @@ is_auth_h(Req) ->
     case IsAuth of
         true ->
             {true, Req};
-        {error, _} ->
-            Req1 = helpers:five00(Req),
+        {error, Error} ->
+            Req1 = helpers:five00(Req, Error),
             {stop, Req1};
         _ ->
             {{false, <<"Bearer realm=\"cowboy\"">>}, Req}

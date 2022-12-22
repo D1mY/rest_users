@@ -11,11 +11,11 @@
 %  login!>,password->,name?> token<->,tokenexp<->,created->,encpass->,passsalt->,login->,name->
 -spec add_user(bitstring(), bitstring(), bitstring()) -> map() | {error, any()}.
 add_user(Name, Login, Password) ->
-    Resp = pgo:query(
+    Resp = pgo:query(Q =
         <<"SELECT login ",
           "FROM users ",
           "WHERE login = $1;">>,
-        [Login],
+        P = [Login],
         ?PGODECOPTS
     ),
     case Resp of
@@ -25,35 +25,33 @@ add_user(Name, Login, Password) ->
             CreatedAt = os:system_time(seconds),
             Token = helpers:new_token(),
             TokenExp = helpers:new_token_expiration(CreatedAt),
-            Resp1 = pgo:query(
+            Resp1 = pgo:query(Q1 =
                 <<"INSERT INTO users (name, login, password, passsalt, created_at, token, token_expiration) ",
                   "VALUES ($1, $2, $3, $4, $5, $6, $7) ",
                   "RETURNING token, token_expiration;">>,
-                [Name, Login, EncPass, PassSalt, CreatedAt, Token, TokenExp],
+                P1 = [Name, Login, EncPass, PassSalt, CreatedAt, Token, TokenExp],
                 ?PGODECOPTS
             ),
             case Resp1 of
                 #{num_rows := 1, rows := [Res]} ->
                     Res#{token_type => <<"Bearer">>};
-                _Error1 ->
-                    % log(_Error1)
-                    {error, <<"oops! try again">>}
+                _ ->
+                    {error, [Q1, P1, Resp1]}
             end;
         #{num_rows := 1} ->
             #{message => <<"login \"", Login/binary, "\" declined">>};
-        _Error ->
-            % log(_Error)
-            {error, <<"oops! try again">>}
+        _ ->
+            {error, [Q, P, Resp]}
     end.
 
 %  token!> tokenexp<?
 -spec check_is_auth(bitstring()) -> boolean() | {error, any()}.
 check_is_auth(Token) ->
-    Resp = pgo:query(
+    Resp = pgo:query(Q =
         <<"SELECT token_expiration ",
           "FROM users ",
           "WHERE token = $1;">>,
-        [Token],
+        P = [Token],
         ?PGODECOPTS
     ),
     case Resp of
@@ -61,30 +59,33 @@ check_is_auth(Token) ->
             TokenExpiration > os:system_time(seconds);
         #{num_rows := 0} ->
             false;
-        _Error ->
-            % log(Error)
-            {error, <<"oops! try again">>}
+        _ ->
+            {error, [Q, P, Resp]}
     end.
 
 %  login!>,password!> token<->,tokenexp<->,token_type<-
--spec get_auth(bitstring(), bitstring()) -> map() | list().
+-spec get_auth(bitstring(), bitstring()) -> map() | {error, any()}.
 get_auth(Login, Password) ->
     % Postgres will drop idle transaction session after <Timeout>
     Timeout = 10000,
+    %TODO log(Error)
     pgo:query(<<"SET 'idle_in_transaction_session_timeout' = $1;">>, [Timeout]),
     pgo:transaction(fun() ->
         handle_auth(Login, Password)
     end).
 
 %  -> [id,name]<-
--spec get_users() -> map().
+-spec get_users() -> map() | {error, any()}.
 get_users() ->
-    case pgo:query(<<"SELECT id, name FROM users;">>, [], ?PGODECOPTS) of
-        #{num_rows := Num, rows := Resp} ->
-            #{count => Num, users => Resp};
-        _Error ->
-            %TODO log(_Error)
-            #{message => <<"unavailable">>}
+    case Resp = pgo:query(Q =
+        <<"SELECT id, name FROM users;">>,
+        P = [],
+        ?PGODECOPTS
+    ) of
+        #{num_rows := Num, rows := Res} ->
+            #{count => Num, users => Res};
+        _ ->
+            {error, [Q, P, Resp]}
     end.
 
 %  token!>,login!>,password!>,newpassword-> token<->,tokenexp<->,updated->,encpass->,passsault->
@@ -92,6 +93,7 @@ get_users() ->
 update_user(Token, Login, Password, NewPassword) ->
     % Postgres will drop idle transaction session after <Timeout>
     Timeout = 10000,
+    %TODO log(Error)
     pgo:query(<<"SET 'idle_in_transaction_session_timeout' = $1;">>, [Timeout]),
     pgo:transaction(fun() ->
         handle_update_user(Token, Login, Password, NewPassword)
@@ -100,12 +102,12 @@ update_user(Token, Login, Password, NewPassword) ->
 %%%% Private -------------------------------------------------------------------------------------
 -spec handle_auth(bitstring(), 'ok' | tuple()) -> map() | {error, any()}.
 handle_auth(Login, Password) ->
-    Resp = pgo:query(
+    Resp = pgo:query(Q =
         <<"SELECT password, passsalt ",
           "FROM users ",
           "WHERE login = $1 ",
           "FOR UPDATE NOWAIT;">>,
-        [Login],
+        P = [Login],
         ?PGODECOPTS
     ),
     case Resp of
@@ -117,20 +119,19 @@ handle_auth(Login, Password) ->
                     Token = helpers:new_token(),
                     TokenExpiration = helpers:new_token_expiration('new'),
                     Resp1 =
-                        pgo:query(
+                        pgo:query(Q1 =
                             <<"UPDATE users ",
                             "SET token = $1, token_expiration = $2 ",
                             "WHERE login = $3 ",
                             "RETURNING token, token_expiration;">>,
-                            [Token, TokenExpiration, Login],
+                            P1 = [Token, TokenExpiration, Login],
                             ?PGODECOPTS
                         ),
                     case Resp1 of
                         #{num_rows := 1, rows := [Res]} ->
                             Res#{token_type => <<"Bearer">>};
-                        _Error1 ->
-                            % log(Error1)
-                            {error, <<"oops! try again">>}
+                        _ ->
+                            {error, [Q1, P1, Resp1]}
                     end;
                 false ->
                     % wrong password
@@ -139,19 +140,18 @@ handle_auth(Login, Password) ->
         #{num_rows := 0} ->
             % login missed
             #{message => <<"incorrect login or password">>};
-        _Error ->
-            % log(_Error)
-            {error, <<"oops! try again">>}
+        _ ->
+            {error, [Q, P, Resp]}
     end.
 
 -spec handle_update_user(bitstring(), bitstring(), bitstring(), bitstring()) -> map() | {error, any()}.
 handle_update_user(Token, Login, Password, NewPassword) ->
-    Resp = pgo:query(
+    Resp = pgo:query(Q =
         <<"SELECT password, passsalt ",
           "FROM users ",
           "WHERE (token = $1 AND login = $2) ",
           "FOR UPDATE NOWAIT;">>,
-        [Token, Login],
+        P = [Token, Login],
         ?PGODECOPTS
     ),
     case Resp of
@@ -165,20 +165,19 @@ handle_update_user(Token, Login, Password, NewPassword) ->
                     NewToken = helpers:new_token(),
                     NewTokenExp = helpers:new_token_expiration(UpdatedAt),
                     Resp1 =
-                        pgo:query(
+                        pgo:query(Q1 =
                             <<"UPDATE users ",
                               "SET password = $1, passsalt = $2, token = $3, token_expiration = $4, updated_at = $5 ",
                               "WHERE token = $6 ",
                               "RETURNING token, token_expiration;">>,
-                            [EncPass, PassSalt, NewToken, NewTokenExp, UpdatedAt, Token],
+                            P1 = [EncPass, PassSalt, NewToken, NewTokenExp, UpdatedAt, Token],
                             ?PGODECOPTS
                         ),
                     case Resp1 of
                         #{num_rows := 1, rows := [Res]} ->
                             Res#{token_type => <<"Bearer">>};
                         _Error1 ->
-                            %TODO log(_Error1)
-                            {error, <<"oops! try again">>}
+                            {error, [Q1, P1, Resp1]}
                     end;
                 false ->
                     % wrong password
@@ -186,7 +185,6 @@ handle_update_user(Token, Login, Password, NewPassword) ->
             end;
         #{num_rows := 0} ->
             #{message => <<"incorrect token or login">>};
-        _Error ->
-            % log(_Error)
-            {error, <<"oops! try again">>}
+        _ ->
+            {error, [Q, P, Resp]}
     end.

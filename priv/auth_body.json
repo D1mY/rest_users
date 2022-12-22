@@ -1,14 +1,16 @@
 {
   "href": "/auth",
+  "content-type": "application/json",
   "method": "POST",
-  "content-type":"application/json",
-  "request": {
-    "login": "<Login>",
-    "password":"<Password>"
-  },
-  "response": {
-    "token": "<Token>",
-    "token_expiration": "<POSIX time>",
-    "token_type": "Bearer"
-  }
+  "request":
+    {
+      "login": "<string:100>",
+      "password": "<string>"
+    },
+  "response":
+    {
+      "token": "<string>",
+      "token_expiration": "<number:POSIX time>",
+      "token_type": "Bearer"
+    }
 }

@@ -5,8 +5,10 @@
 -export([new_token_expiration/1]).
 -export([new_token/0]).
 
--export([five00/1]).
+-export([five00/2]).
 -export([two00/2]).
+
+-include_lib("kernel/include/logger.hrl").
 
 %%%% Twerks --------------------------------------------------------------------------------------
 -spec encode_password(binary(), binary()) -> binary().
@@ -43,7 +45,9 @@ is_alphanum(C) when C >= 16#61 andalso C =< 16#7A -> true;
 is_alphanum(_) -> false.
 
 %%%% Replies -------------------------------------------------------------------------------------
-five00(Req) ->
+-spec five00(any(), any()) -> any().
+five00(Req, Error) ->
+  log(Error),
   cowboy_req:reply(
     500,
     #{<<"content-type">> => <<"application/json">>},
@@ -51,7 +55,14 @@ five00(Req) ->
     Req
   ).
 
+-spec two00(any(), binary()) -> any().
 two00(Req, JSON) ->
 cowboy_req:reply(200, #{
     <<"content-type">> => <<"application/json">>
     }, JSON, Req).
+
+%%%% Logger --------------------------------------------------------------------------------------
+log({error, [Q,P,R]}) ->
+    ?LOG_ERROR(#{query => Q, params => P, response => R});
+log(Error) ->
+    ?LOG_ERROR(#{response => Error}).

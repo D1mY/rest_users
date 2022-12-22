@@ -20,6 +20,16 @@
       "href": "/users",
       "rel": "list",
       "method": "GET"
+    },
+    {
+      "href": "/auth",
+      "rel": "info",
+      "method": "OPTIONS"
+    },
+    {
+      "href": "/users",
+      "rel": "info",
+      "method": "OPTIONS"
     }
   ]
 }
