@@ -5,6 +5,10 @@
 -export([new_token_expiration/1]).
 -export([new_token/0]).
 
+-export([five00/1]).
+-export([two00/2]).
+
+%%%% Twerks --------------------------------------------------------------------------------------
 -spec encode_password(binary(), binary()) -> binary().
 encode_password(Password, PassSalt) ->
     crypto:pbkdf2_hmac(sha256, Password, PassSalt, 4096, 32).
@@ -37,3 +41,17 @@ is_alphanum(C) when C >= 16#30 andalso C =< 16#39 -> true;
 is_alphanum(C) when C >= 16#41 andalso C =< 16#5A -> true;
 is_alphanum(C) when C >= 16#61 andalso C =< 16#7A -> true;
 is_alphanum(_) -> false.
+
+%%%% Replies -------------------------------------------------------------------------------------
+five00(Req) ->
+  cowboy_req:reply(
+    500,
+    #{<<"content-type">> => <<"application/json">>},
+    <<"oops! try again">>,
+    Req
+  ).
+
+two00(Req, JSON) ->
+cowboy_req:reply(200, #{
+    <<"content-type">> => <<"application/json">>
+    }, JSON, Req).

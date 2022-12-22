@@ -1,0 +1,14 @@
+{
+  "href": "/auth",
+  "method": "POST",
+  "content-type":"application/json",
+  "request": {
+    "login": "<Login>",
+    "password":"<Password>"
+  },
+  "response": {
+    "token": "<Token>",
+    "token_expiration": "<POSIX time>",
+    "token_type": "Bearer"
+  }
+}

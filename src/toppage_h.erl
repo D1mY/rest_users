@@ -5,29 +5,11 @@
 % -export([content_types_accepted/2]).
 % -export([hello_to_json/2]).
 
-init(Req0, Opts) ->
-    Req = cowboy_req:reply(200, #{
-        <<"content-type">> => <<"application/json">>
-        },
-        <<"{\"name\":\"rest_users\",",
-            "\"version\":\"0.1.0\",",
-            "\"links\":[
-                {\"href\":\"/users\",
-                 \"rel\":\"create\",
-                 \"method\":\"POST\"},
-                {\"href\":\"/auth\",
-                 \"rel\":\"login\",
-                 \"method\":\"POST\"},
-                {\"href\":\"/users\",
-                 \"rel\":\"update\",
-                 \"method\":\"PUT\"},
-                {\"href\":\"/users\",
-                 \"rel\":\"list\",
-                 \"method\":\"GET\"}
-                ]}\n">>,
-        Req0),
-    % {cowboy_rest, Req, Opts}.
-    {ok, Req, Opts}.
+init(Req, Opts) ->
+    {ok, JSON} = file:read_file("priv/toppage_body.json"),
+    Req1 = helpers:two00(Req, JSON),
+    {ok, Req1, Opts}.
+    % {cowboy_rest, Req1, Opts}.
 
 % content_types_provided(Req, State) ->
 %     {[
@@ -40,4 +22,4 @@ init(Req0, Opts) ->
 %     ], Req, State}.
 
 % hello_to_json(Req, State) ->
-%     {<<"{\"rest\": \"Hello World!\"}">>, Req, State}.
+%     {<<"{\"rest\": \"Hello from rest_users\"}">>, Req, State}.

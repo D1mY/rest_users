@@ -1,4 +1,6 @@
- [
+{
+  "name": "rest_users",
+  "links": [
     {
       "href": "/users",
       "rel": "create",
@@ -20,3 +22,4 @@
       "method": "GET"
     }
   ]
+}
