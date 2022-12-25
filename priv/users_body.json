@@ -1,8 +1,8 @@
 [
   {
     "href": "/users",
-    "content-type": "application/json",
     "method": "POST",
+    "content-type": "application/json",
     "request": {
       "name": "[string]",
       "login": "<string:100>",
@@ -16,9 +16,9 @@
   },
   {
     "href": "/users",
+    "method": "PUT",
     "content-type": "application/json",
     "authorization": "Bearer",
-    "method": "PUT",
     "request": {
       "login": "<string:100>",
       "password": "<string>",
@@ -32,9 +32,9 @@
   },
   {
     "href": "/users",
+    "method": "GET",
     "content-type": "application/json",
     "authorization": "Bearer",
-    "method": "GET",
     "response": {
       "count": "<number>",
       "users": [

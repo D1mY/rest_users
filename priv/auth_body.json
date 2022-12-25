@@ -1,7 +1,7 @@
 {
   "href": "/auth",
-  "content-type": "application/json",
   "method": "POST",
+  "content-type": "application/json",
   "request":
     {
       "login": "<string:100>",
