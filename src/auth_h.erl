@@ -24,7 +24,8 @@ options(Req, State) ->
     {ok, Req1, State}.
 
 %%%% Handlers ------------------------------------------------------------------------------------
-auth_json(Req, State) ->
+auth_json(Req0, State) ->
+    Req = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req0),
     {_, Body, _} = cowboy_req:read_body(Req),
     case thoas:decode(Body) of
         {ok, #{<<"login">> := Lo, <<"password">> := Pa}} ->
@@ -34,7 +35,7 @@ auth_json(Req, State) ->
                     {stop, Req1, State};
                 Resp ->
                     Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
-                    Req2 = cowboy_req:set_resp_header(<<"cache-control">>, "no-store", Req1),
+                    Req2 = cowboy_req:set_resp_header(<<"cache-control">>, <<"no-store">>, Req1),
                 {true, Req2, State}
                 end;
         _ ->

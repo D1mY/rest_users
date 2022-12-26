@@ -10,6 +10,7 @@ create table if not exists users
  token text,
  token_expiration integer
 );
+truncate users;
 insert into users
 (
   name,
@@ -24,8 +25,8 @@ values
 (
   'Joe A',
   'joe',
-  '\x18cafb13610104260a863fc1768ce49fce7008a79f8f12b39692f241f7d64ee6',
-  '\xe56cc335e2e0ce611da4ba53d046c2c2995cd733e3222d200594117a2bed58f7',
+  '\xca1813fb01612604860ac13f8c769fe470cea7088f9fb312929641f2d6f7e64e',
+  '\x6ce535c3e0e261cea41d53ba46d0c2c25c9933d722e3202d94057a11ed2bf758',
   1555740366,
   'sT1eGzQVP3F5IaFid6XqvzshozsVakTa',
   1655740366

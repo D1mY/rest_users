@@ -5,7 +5,8 @@
 % -export([content_types_accepted/2]).
 % -export([hello_to_json/2]).
 
-init(Req, Opts) ->
+init(Req0, Opts) ->
+    Req = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req0),
     {ok, JSON} = file:read_file("priv/toppage_body.json"),
     Req1 = helpers:two00(Req, JSON),
     {ok, Req1, Opts}.
@@ -22,4 +23,5 @@ init(Req, Opts) ->
 %     ], Req, State}.
 
 % hello_to_json(Req, State) ->
-%     {<<"{\"rest\": \"Hello from rest_users\"}">>, Req, State}.
+%     {ok, JSON} = file:read_file("priv/toppage_body.json"),
+%     {JSON, Req, State}.

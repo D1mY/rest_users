@@ -77,11 +77,12 @@ get_auth(Login, Password) ->
 %  -> [id,name]<-
 -spec get_users() -> map() | {error, any()}.
 get_users() ->
-    case Resp = pgo:query(Q =
+    Resp = pgo:query(Q =
         <<"SELECT id, name FROM users;">>,
         P = [],
         ?PGODECOPTS
-    ) of
+    ),
+    case Resp of
         #{num_rows := Num, rows := Res} ->
             #{count => Num, users => Res};
         _ ->

@@ -40,18 +40,19 @@ options(Req, State) ->
     {ok, Req1, State}.
 
 %%%% Handlers ------------------------------------------------------------------------------------
-users_json(Req, State) ->
+users_json(Req0, State) ->
+    Req = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req0),
     Resp = db_q:get_users(),
     case Resp of
             {error, Error} ->
                 Req1 = helpers:five00(Req, Error),
                 {stop, Req1, State};
             _ ->
-                Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
-                {true, Req1, State}
+                {thoas:encode(Resp), Req, State}
         end.
 
-users_h(Req, State) ->
+users_h(Req0, State) ->
+    Req = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req0),
     Method = cowboy_req:method(Req),
     {_, Body, _} = cowboy_req:read_body(Req),
     UserObj = thoas:decode(Body),
