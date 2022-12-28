@@ -5,10 +5,10 @@ create table if not exists users
  login varchar(100) unique,
  password bytea not null,
  passsalt bytea not null,
- created_at integer,
- updated_at integer,
+ created_at bigint,
+ updated_at bigint,
  token text,
- token_expiration integer
+ token_expiration bigint
 );
 truncate users;
 insert into users
@@ -29,5 +29,5 @@ values
   '\x6ce535c3e0e261cea41d53ba46d0c2c25c9933d722e3202d94057a11ed2bf758',
   1555740366,
   'sT1eGzQVP3F5IaFid6XqvzshozsVakTa',
-  1655740366
+  2555737627
 );

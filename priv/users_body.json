@@ -4,13 +4,13 @@
     "method": "POST",
     "content-type": "application/json",
     "request": {
-      "name": "[string]",
-      "login": "<string:100>",
-      "password": "<string>"
+      "name": "::string",
+      "login": "::string(max 100)",
+      "password": "::string"
     },
     "response": {
-      "token": "<string>",
-      "token_expiration": "<number:POSIX time>",
+      "token": "::string",
+      "token_expiration": "::number(POSIX time)",
       "token_type": "Bearer"
     }
   },
@@ -20,13 +20,13 @@
     "content-type": "application/json",
     "authorization": "Bearer",
     "request": {
-      "login": "<string:100>",
-      "password": "<string>",
-      "newpassword": "<string>"
+      "login": "::string(max 100)",
+      "password": "::string",
+      "newpassword": "::string"
     },
     "response": {
-      "token": "<string>",
-      "token_expiration": "<number:POSIX time>",
+      "token": "::string",
+      "token_expiration": "::number(POSIX time)",
       "token_type": "Bearer"
     }
   },
@@ -36,11 +36,11 @@
     "content-type": "application/json",
     "authorization": "Bearer",
     "response": {
-      "count": "<number>",
+      "count": "::number",
       "users": [
         {
-          "id": "<number>",
-          "name": "<string>"
+          "id": "::number",
+          "name": "::string"
         }
       ]
     }

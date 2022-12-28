@@ -19,9 +19,11 @@ content_types_accepted(Req, State) ->
     {[{<<"application/json">>, auth_json}], Req, State}.
 
 options(Req, State) ->
-    {ok, JSON} = file:read_file("priv/auth_body.json"),
+    PrivPath = code:priv_dir(rest_users),
+    {ok, JSON} = file:read_file(PrivPath ++ "/auth_body.json"),
     Req1 = cowboy_req:set_resp_body(JSON, Req),
-    {ok, Req1, State}.
+    Req2 = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req1),
+    {ok, Req2, State}.
 
 %%%% Handlers ------------------------------------------------------------------------------------
 auth_json(Req0, State) ->

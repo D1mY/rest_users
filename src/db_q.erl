@@ -66,10 +66,9 @@ check_is_auth(Token) ->
 %  login!>,password!> token<->,tokenexp<->,token_type<-
 -spec get_auth(bitstring(), bitstring()) -> map() | {error, any()}.
 get_auth(Login, Password) ->
-    % Postgres will drop idle transaction session after <Timeout>
-    Timeout = 10000,
     %TODO log(Error)
-    pgo:query(<<"SET 'idle_in_transaction_session_timeout' = $1;">>, [Timeout]),
+    % Postgres will drop idle transaction session after <Timeout>
+    pgo:query(<<"UPDATE pg_settings SET setting = 10000 WHERE name = 'idle_in_transaction_session_timeout';">>),
     pgo:transaction(fun() ->
         handle_auth(Login, Password)
     end).
@@ -92,10 +91,9 @@ get_users() ->
 %  token!>,login!>,password!>,newpassword-> token<->,tokenexp<->,updated->,encpass->,passsault->
 -spec update_user(bitstring(), bitstring(), bitstring(), bitstring()) -> map().
 update_user(Token, Login, Password, NewPassword) ->
-    % Postgres will drop idle transaction session after <Timeout>
-    Timeout = 10000,
     %TODO log(Error)
-    pgo:query(<<"SET 'idle_in_transaction_session_timeout' = $1;">>, [Timeout]),
+    % Postgres will drop idle transaction session after <Timeout>
+    pgo:query(<<"UPDATE pg_settings SET setting = 10000 WHERE name = 'idle_in_transaction_session_timeout';">>),
     pgo:transaction(fun() ->
         handle_update_user(Token, Login, Password, NewPassword)
     end).
@@ -121,7 +119,7 @@ handle_auth(Login, Password) ->
                     TokenExpiration = helpers:new_token_expiration('new'),
                     Resp1 =
                         pgo:query(Q1 =
-                            <<"UPDATE users ",
+                          <<"UPDATE users ",
                             "SET token = $1, token_expiration = $2 ",
                             "WHERE login = $3 ",
                             "RETURNING token, token_expiration;">>,

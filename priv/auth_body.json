@@ -4,13 +4,13 @@
   "content-type": "application/json",
   "request":
     {
-      "login": "<string:100>",
-      "password": "<string>"
+      "login": "::string(max 100)>",
+      "password": "::string"
     },
   "response":
     {
-      "token": "<string>",
-      "token_expiration": "<number:POSIX time>",
+      "token": "::string",
+      "token_expiration": "::number(POSIX time)",
       "token_type": "Bearer"
     }
 }

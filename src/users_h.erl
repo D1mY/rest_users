@@ -35,9 +35,11 @@ content_types_accepted(Req, State) ->
     {[{<<"application/json">>, users_h}], Req, State}.
 
 options(Req, State) ->
-    {ok, JSON} = file:read_file("priv/users_body.json"),
+    PrivPath = code:priv_dir(rest_users),
+    {ok, JSON} = file:read_file(PrivPath ++ "/users_body.json"),
     Req1 = cowboy_req:set_resp_body(JSON, Req),
-    {ok, Req1, State}.
+    Req2 = cowboy_req:set_resp_header(<<"content-type">>, <<"application/json">>, Req1),
+    {ok, Req2, State}.
 
 %%%% Handlers ------------------------------------------------------------------------------------
 users_json(Req0, State) ->
@@ -61,6 +63,9 @@ users_h(Req0, State) ->
             {error, Error} ->
                 Req1 = helpers:five00(Req, Error),
                 {stop, Req1, State};
+            #{message := _} = Four00 ->
+                Req1 = cowboy_req:set_resp_body(thoas:encode(Four00), Req),
+                {false, Req1, State};
             _ ->
                 Req1 = cowboy_req:set_resp_body(thoas:encode(Resp), Req),
                 Req2 = cowboy_req:set_resp_header(<<"cache-control">>, "no-store", Req1),

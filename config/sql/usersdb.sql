@@ -5,8 +5,8 @@ create table if not exists users
  login varchar(100) unique,
  password bytea not null,
  passsalt bytea not null,
- created_at integer,
- updated_at integer,
+ created_at bigint,
+ updated_at bigint,
  token text,
- token_expiration integer
+ token_expiration bigint
 );

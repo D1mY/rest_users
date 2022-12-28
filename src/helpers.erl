@@ -51,7 +51,7 @@ five00(Req, Error) ->
   cowboy_req:reply(
     500,
     #{<<"content-type">> => <<"application/json">>},
-    <<"oops! try again">>,
+    <<"{\"message\": \"oops! try again\"}">>,
     Req
   ).
 
