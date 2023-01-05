@@ -2,18 +2,23 @@
 
 OTP application as REST API service
 
+## Get
+
+`git clone`
+
+## Set
+
+Edit `.env` file if preferred.
+
 ## Test
 
-`rebar3 ct`
-
-## Build
-
-`rebar3 compile`
-
-## Release
-
-`rebar3 release`
+`docker compose up ct`
 
 ## Deploy
 
 `docker compose up`
+
+## Usage
+
+Start abuse it by URI:
+`https://localhost:8443/`
