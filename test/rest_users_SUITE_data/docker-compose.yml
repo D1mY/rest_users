@@ -4,11 +4,8 @@ services:
     environment:
       POSTGRES_USER: restadmin
       POSTGRES_PASSWORD: r35t@dm1n
-      POSTGRES_DB: usersdb_test
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      POSTGRES_DB: usersdb
     volumes:
       - ../config/sql:/docker-entrypoint-initdb.d
-      # - ./_dbfiles:/var/lib/postgresql/data
     ports:
-      - 5433:5432
-    restart: always
+      - 5432:5432

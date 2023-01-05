@@ -1,0 +1,70 @@
+services:
+  rest_users: &rest_users
+    build: .
+    environment:
+      - PGHOST=${PGHOST:-db}
+    volumes:
+      - ${REST_USERS_LOGS:-rest_users_logs}:/tmp/log
+    ports:
+      - 8443:8443
+    restart: always
+  db: &db
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${PGUSER:-restadmin}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-r35t@dm1n}
+      POSTGRES_DB: ${PGDATABASE:-usersdb}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - ${DBFILESDIR:-pgdata}:/var/lib/postgresql/data
+    hostname: ${PGHOST:-db}
+    ports:
+      - 5432:5432
+    restart: always
+  dev: &dev
+    image: erlang:25-alpine
+    volumes:
+      - ${PWD}:/${PWD}
+      - rebar_cache:/rebar_data
+    environment:
+      REBAR_CACHE_DIR: /rebar_data/.cache
+      REBAR_GLOBAL_CONFIG_DIR: /rebar_data/.config
+      REBAR_BASE_DIR: /rebar_data/.project-cache${PWD}
+      PS1: '[\W]\! '
+    working_dir: ${PWD}
+    entrypoint: /bin/sh
+    stdin_open: true
+    tty: true
+    tmpfs:
+      - /tmp
+    profiles:
+      - dev
+      - test
+  db-ct:
+    <<: *db
+    hostname: db-ct
+    restart: unless-stopped
+    volumes:
+      - ./test/config/sql:/docker-entrypoint-initdb.d
+    profiles:
+      - test
+  ct:
+    # <<: *rest_users
+    <<: *dev
+    environment:
+      - PGHOST=db-ct
+      - RELX_OUT_FILE_PATH=/tmp
+    ports:
+      - 8443:8443
+    depends_on:
+      - db-ct
+    profiles:
+      - test
+    entrypoint: rebar3
+    command: ["ct"]
+
+volumes:
+  pgdata:
+  rest_users_logs:
+  rebar_cache:

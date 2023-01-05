@@ -10,6 +10,10 @@ OTP application as REST API service
 
 `rebar3 compile`
 
+## Release
+
+`rebar3 release`
+
 ## Deploy
 
 `docker compose up`
