@@ -2,6 +2,10 @@
 
 OTP application as REST API service
 
+## Pre
+
+Requires `Docker` & `Docker Compose`
+
 ## Get
 
 `git clone`
