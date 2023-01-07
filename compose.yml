@@ -1,5 +1,5 @@
 services:
-  rest_users: &rest_users
+  rest_users:
     build: .
     environment:
       - PGHOST=${PGHOST:-db}
@@ -50,7 +50,6 @@ services:
     profiles:
       - test
   ct:
-    # <<: *rest_users
     <<: *dev
     environment:
       - PGHOST=db-ct

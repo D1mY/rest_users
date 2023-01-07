@@ -16,7 +16,6 @@ FROM alpine:3.16
 
     # write files generated during startup to /tmp
 ENV RELX_OUT_FILE_PATH=/tmp \ 
-    # TODO: share log
     REST_USERS_LOGFILE=/tmp/log/error.log
 
 # Install libs
