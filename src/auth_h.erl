@@ -41,5 +41,6 @@ auth_json(Req0, State) ->
                 {true, Req2, State}
                 end;
         _ ->
-            {false, Req, State}
+            Req1 = cowboy_req:set_resp_body(thoas:encode(#{message => <<"incorrect request body format">>}), Req),
+            {false, Req1, State}
     end.
