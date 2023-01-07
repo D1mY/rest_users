@@ -1,0 +1,19 @@
+% rebar3 >= 3.14.0, otp >= 21
+[
+ {kernel,
+  [{logger_level, error},
+   {logger,
+    [{handler, default, logger_std_h,
+            #{level => error,
+              config => #{file => "${REST_USERS_LOGFILE:-log/error.log}",
+                          max_no_bytes => 4096,
+                          max_no_files => 3}}}]}]},
+ {pgo,
+  [{pools,
+    [{default, #{pool_size => 5,
+                 host => "${PGHOST:-127.0.0.1}",
+                 port => ${PGPORT:-5432},
+                 database => "${PGDATABASE:-usersdb}",
+                 user => "${PGUSER:-restadmin}",
+                 password => "${PGPASSWORD:-r35t@dm1n}"}}]}]}
+].

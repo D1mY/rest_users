@@ -1,0 +1,35 @@
+{
+  "name": "rest_users",
+  "links": [
+    {
+      "href": "/users",
+      "rel": "create",
+      "method": "POST"
+    },
+    {
+      "href": "/auth",
+      "rel": "login",
+      "method": "POST"
+    },
+    {
+      "href": "/users",
+      "rel": "update",
+      "method": "PUT"
+    },
+    {
+      "href": "/users",
+      "rel": "list",
+      "method": "GET"
+    },
+    {
+      "href": "/auth",
+      "rel": "info",
+      "method": "OPTIONS"
+    },
+    {
+      "href": "/users",
+      "rel": "info",
+      "method": "OPTIONS"
+    }
+  ]
+}

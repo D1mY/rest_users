@@ -1,0 +1,48 @@
+[
+  {
+    "href": "/users",
+    "method": "POST",
+    "content-type": "application/json",
+    "request": {
+      "name": "::string",
+      "login": "::string(max 100)",
+      "password": "::string"
+    },
+    "response": {
+      "token": "::string",
+      "token_expiration": "::number(POSIX time)",
+      "token_type": "Bearer"
+    }
+  },
+  {
+    "href": "/users",
+    "method": "PUT",
+    "content-type": "application/json",
+    "authorization": "Bearer",
+    "request": {
+      "login": "::string(max 100)",
+      "password": "::string",
+      "newpassword": "::string"
+    },
+    "response": {
+      "token": "::string",
+      "token_expiration": "::number(POSIX time)",
+      "token_type": "Bearer"
+    }
+  },
+  {
+    "href": "/users",
+    "method": "GET",
+    "content-type": "application/json",
+    "authorization": "Bearer",
+    "response": {
+      "count": "::number",
+      "users": [
+        {
+          "id": "::number",
+          "name": "::string"
+        }
+      ]
+    }
+  }
+]
